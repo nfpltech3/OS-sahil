@@ -31,6 +31,7 @@ export default function NewUserPage() {
     user_type: 'employee' as 'employee' | 'client',
     department_id: '',
     org_id: '',
+    is_team_lead: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -104,6 +105,14 @@ export default function NewUserPage() {
 
   async function handleFinish() {
     setError('');
+
+    // Validation: if app admin or team lead is true, department must be assigned
+    const hasAppAdmin = Object.values(appSelections).some((s) => s.enabled && s.isAppAdmin);
+    if ((hasAppAdmin || form.is_team_lead) && !form.department_id) {
+      setError('A Department must be assigned if the user is a Team Lead or App Admin.');
+      return;
+    }
+
     setLoading(true);
     try {
       const created = await createUser({
@@ -234,17 +243,38 @@ export default function NewUserPage() {
 
                     {/* Department */}
                     {form.user_type !== 'client' && (
-                      <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#94A3B8' }}>Department</label>
-                        <select value={form.department_id} onChange={(e) => set('department_id', e.target.value)}
-                          className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none"
-                          style={inputStyle}
-                        >
-                          <option value="">No department</option>
-                          {departments.map((d) => (
-                            <option key={d.id} value={d.id}>{d.name}</option>
-                          ))}
-                        </select>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#94A3B8' }}>Department</label>
+                          <select value={form.department_id} onChange={(e) => set('department_id', e.target.value)}
+                            className="w-full px-3 py-2.5 rounded-lg text-sm focus:outline-none"
+                            style={inputStyle}
+                          >
+                            <option value="">No department</option>
+                            {departments.map((d) => (
+                              <option key={d.id} value={d.id}>{d.name}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-3 p-4 rounded-xl" style={{ border: '1px solid #E2E8F0', backgroundColor: '#F8FAFC' }}>
+                          <div>
+                            <p className="text-sm font-semibold" style={{ color: '#1a202c' }}>Department Team Lead</p>
+                            <p className="text-xs mt-0.5" style={{ color: '#64748B' }}>Designates this user as the manager of their assigned department.</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setForm(prev => ({ ...prev, is_team_lead: !prev.is_team_lead }))}
+                            className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                            style={{ backgroundColor: form.is_team_lead ? '#1B3A6C' : '#CBD5E1' }}
+                            aria-pressed={form.is_team_lead ? 'true' : 'false'}
+                          >
+                            <span
+                              className="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform"
+                              style={{ transform: form.is_team_lead ? 'translateX(24px)' : 'translateX(4px)' }}
+                            />
+                          </button>
+                        </div>
                       </div>
                     )}
 

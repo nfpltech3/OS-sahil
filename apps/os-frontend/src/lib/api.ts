@@ -47,6 +47,7 @@ export async function createUser(data: {
   user_type: 'employee' | 'client';
   department_id?: string;
   org_id?: string;
+  is_team_lead?: boolean;
 }) {
   const res = await api.post('/users', data);
   return res.data;

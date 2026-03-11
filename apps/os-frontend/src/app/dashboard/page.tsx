@@ -1,9 +1,10 @@
-﻿'use client';
+'use client';
 
 import { useAuth } from '@/context/AuthContext';
 import { getSsoToken } from '@/lib/api';
 import { AppTile } from '@/lib/auth.types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AdminLayout from '@/components/AdminLayout';
 
@@ -73,9 +74,10 @@ function AppCard({ app, onClick, loading }: { app: AppTile; onClick: () => void;
 }
 
 export default function DashboardPage() {
-  const { user, allowed_apps } = useAuth();
+  const { user, allowed_apps, loading } = useAuth();
   const [launchingSlug, setLaunchingSlug] = useState<string | null>(null);
   const isAdmin = user?.user_type === 'admin';
+  const router = useRouter();
 
   async function handleTileClick(app: AppTile) {
     if (launchingSlug) return;
@@ -90,6 +92,13 @@ export default function DashboardPage() {
     }
   }
 
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [loading, user, router]);
+
+  if (loading) return null;
   if (!user) return null;
 
   return (

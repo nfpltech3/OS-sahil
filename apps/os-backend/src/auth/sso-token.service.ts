@@ -44,6 +44,7 @@ export class SsoTokenService {
       department_slug: user.department?.slug ?? null,
       department_name: user.department?.name ?? null,
       is_app_admin: appAccess.is_app_admin,
+      is_team_lead: user.is_team_lead ?? false,
       org_id,
       org_name,
     };

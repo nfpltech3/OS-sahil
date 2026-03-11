@@ -165,6 +165,7 @@ export class UsersService {
       name: dto.name,
       userType,
       is_active: true,
+      is_team_lead: dto.is_team_lead ?? false,
     });
 
     if (dto.department_id) {
@@ -203,6 +204,7 @@ export class UsersService {
 
     if (dto.name !== undefined) user.name = dto.name;
     if (dto.is_active !== undefined) user.is_active = dto.is_active;
+    if (dto.is_team_lead !== undefined) user.is_team_lead = dto.is_team_lead;
 
     if (dto.department_id !== undefined) {
       if (dto.department_id === null) {

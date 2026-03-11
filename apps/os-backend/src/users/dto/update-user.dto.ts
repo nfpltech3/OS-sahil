@@ -12,4 +12,8 @@ export class UpdateUserDto {
   @IsOptional()
   @IsUUID()
   department_id?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  is_team_lead?: boolean;
 }

@@ -37,6 +37,14 @@ export class UsersController {
     return this.usersService.getDepartments();
   }
 
+  // GET /users/internal/departments — internal API only
+  @Get('internal/departments')
+  @Public()
+  @UseGuards(InternalApiGuard)
+  getInternalDepartments() {
+    return this.usersService.getDepartments();
+  }
+
   // POST /users/departments — admin only
   @Post('departments')
   @UseGuards(RolesGuard)

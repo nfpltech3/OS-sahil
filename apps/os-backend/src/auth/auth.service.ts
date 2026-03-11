@@ -190,6 +190,7 @@ export class AuthService {
         department_slug: user.department?.slug ?? null,
         department_name: user.department?.name ?? null,
         is_app_admin: access.is_app_admin,
+        is_team_lead: user.is_team_lead ?? false,
         org_id,
         org_name,
       },

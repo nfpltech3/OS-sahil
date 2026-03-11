@@ -25,12 +25,12 @@ async function bootstrap() {
 
   // Allow os-frontend to send cookies
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://192.168.1.23:3000'],
     credentials: true,
   });
 
-  await app.listen(process.env.PORT ?? 3001);
-  console.log('OS Backend running on http://localhost:3001');
+  await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
+  console.log('OS Backend running on http://0.0.0.0:3001');
 }
 
 bootstrap();

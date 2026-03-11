@@ -12,6 +12,7 @@ export interface SsoPayload {
 
   // App permission — OS decides, apps respect
   is_app_admin: boolean;
+  is_team_lead?: boolean;
 
   // Client org — OS owns, apps filter data by this
   org_id: string | null;

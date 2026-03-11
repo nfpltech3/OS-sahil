@@ -67,6 +67,7 @@ export class AuthController {
 
   // POST /auth/verify-session — internal API only
   @Post('verify-session')
+  @HttpCode(200)
   @Public()
   @UseGuards(InternalApiGuard)
   async verifySession(@Body() body: { os_user_id: string }) {

@@ -105,6 +105,10 @@ async function seed() {
   console.log('✅ Departments seeded');
 
   // ─── 4. Admin User ────────────────────────────────────────────────
+  const adminType = await userTypeRepo.findOneOrFail({
+    where: { slug: 'admin' },
+  });
+
   const userRepo = AppDataSource.getRepository(User);
 
   const existingAdmin = await userRepo.findOne({
@@ -118,7 +122,7 @@ async function seed() {
       email: 'admin@nagarkot.com',
       password_hash,
       name: 'Admin',
-      userType: employeeType,
+      userType: adminType,
       is_active: true,
     });
 
@@ -128,7 +132,10 @@ async function seed() {
     console.log('   Password: Admin@1234');
     console.log('   ⚠️  Change this password immediately after first login');
   } else {
-    console.log('⏭️  Admin user already exists — skipping');
+    // Force update to admin type if it was previously employee
+    existingAdmin.userType = adminType;
+    await userRepo.save(existingAdmin);
+    console.log('✅ Admin user updated to Admin type');
   }
 
   // ─── 5. Grant admin access to all apps ───────────────────────────
