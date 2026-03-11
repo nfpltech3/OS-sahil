@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  os-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: os-monorepo-app
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      # These can be overridden in Dokploy's Environment UI
+      - NODE_ENV=production
+      - PORT=3001
+      - DATABASE_URL=postgres://os_user:os_password@db:5432/os_db
+    
+    # These labels tell Traefik (used by Dokploy) how to route traffic
+    labels:
+      - "traefik.enable=true"
+      
+      # 1. Routing for the Next.js Frontend (Root path)
+      - "traefik.http.routers.os-frontend.rule=Host(`os-192.168.1.178.traefik.me`)"
+      - "traefik.http.routers.os-frontend.entrypoints=web"
+      - "traefik.http.services.os-frontend.loadbalancer.server.port=3000"
+      
+      # 2. Routing for the NestJS Backend (/backend path)
+      - "traefik.http.routers.os-backend.rule=Host(`os-192.168.1.178.traefik.me`) && PathPrefix(`/backend`)"
+      - "traefik.http.routers.os-backend.entrypoints=web"
+      - "traefik.http.services.os-backend.loadbalancer.server.port=3001"
+      
+      # 3. Middleware to strip '/backend' from the URL before forwarding to NestJS
+      # (Because NestJS expects /auth/login, not /backend/auth/login)
+      - "traefik.http.middlewares.strip-backend-prefix.stripprefix.prefixes=/backend"
+      - "traefik.http.routers.os-backend.middlewares=strip-backend-prefix"
+
+  db:
+    image: postgres:17-alpine
+    container_name: os-postgres
+    restart: unless-stopped
+    environment:
+      # Note: These values should match the ones in os-app DATABASE_URL
+      # You can override these mapping fields in Dokploy env UI securely too.
+      - POSTGRES_USER=os_user
+      - POSTGRES_PASSWORD=os_password
+      - POSTGRES_DB=os_db
+    volumes:
+      - os-db-data:/var/lib/postgresql/data
+
+volumes:
+  os-db-data:
